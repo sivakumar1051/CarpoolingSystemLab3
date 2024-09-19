@@ -6,82 +6,86 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
-/**
- * Servlet implementation class CarpoolServlet
- */
 
 public class CarpoolServlet extends HttpServlet {
-	
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
     private static final Logger logData = Logger.getLogger(CarpoolServlet.class.getName());
 
-	 private List<String> acceptedRides;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public CarpoolServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-    
+    // List to store available rides
+    private List<CarpoolRide> ridesAvailable = new ArrayList<>();
+
     @Override
     public void init() throws ServletException {
         super.init();
-        // Initialize the list of available carpool rides
-        acceptedRides = new ArrayList<>();
-        acceptedRides.add("Ride 1: Ontario to Montreal");
-        acceptedRides.add("Ride 2: Hyderabad to Delhi");
-        logData.info("CarpoolServlet has been initialized with available rides as followes ::  " + acceptedRides);
+        logData.info("CarpoolServlet initialized.");
     }
 
-    
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Log the incoming request type and URL
         String incomeRequestType = request.getMethod();
         String incomeRequestUrl = request.getRequestURL().toString();
-        logData.info("These are the Incoming request: " + incomeRequestType + " " + incomeRequestUrl);
-        
         super.service(request, response);
     }
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
-        // Using StringBuilder to build the HTML response
-        StringBuilder responseBody = new StringBuilder();
-        responseBody.append("<html>");
-        responseBody.append("<head><title>Carpooling System</title></head>");
-        responseBody.append("<body>");
-        responseBody.append("<P>Welcome to the Carpooling System</p>");
-        responseBody.append("</body>");
-        responseBody.append("</html>");
+        // Read defined HTML template to incorporate response later
+        InputStream inputStream = getServletContext().getResourceAsStream("/carpoolIndex.html");
+        String htmlContent = new Scanner(inputStream, "UTF-8").useDelimiter("\\A").next();
+        inputStream.close();
 
-        // Sending the response
-        response.getWriter().write(responseBody.toString());
+        // Generate available rides data
+        String availableRidesData = generateRideListHtml();
+
+        // Replacing placeholder with available rides data
+        String finalOutput = htmlContent.replace("<!-- Available rides will be populated here -->", availableRidesData);
+
+        // Write the final output data
+        response.getWriter().write(finalOutput);
     }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
-	
-	@Override
+    private String generateRideListHtml() {
+        StringBuilder rideDataBuilder = new StringBuilder();
+        if (ridesAvailable.isEmpty()) {
+            rideDataBuilder.append("<tr><td colspan='3'>No available rides at the moment.</td></tr>");
+        } else {
+            for (CarpoolRide ride : ridesAvailable) {
+                rideDataBuilder.append("<tr>")
+                        .append("<td>").append(ride.getRideStarLocation()).append("</td>")
+                        .append("<td>").append(ride.getRideDestination()).append("</td>")
+                        .append("<td>").append(ride.getNoOfSeats()).append("</td>")
+                        .append("</tr>");
+            }
+        }
+        return rideDataBuilder.toString();
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String startLocation = request.getParameter("startLocation");
+        String destination = request.getParameter("destination");
+        int seatsAvailable = Integer.parseInt(request.getParameter("seatsAvailable"));
+
+        // Create a new ride and add it to the list
+        CarpoolRide newRide = new CarpoolRide(startLocation, destination, seatsAvailable);
+        ridesAvailable.add(newRide);
+        logData.info("New ride offered: " + newRide);
+
+        // Redirect to doGet to display updated list of rides
+        response.sendRedirect(request.getContextPath() + "/Carpool");
+    }
+
+    @Override
     public void destroy() {
-        // Log a message indicating the servlet is being terminated
-        logData.info("The Created CarpoolServlet has been  destroyed.");
+        logData.info("CarpoolServlet destroyed.");
         super.destroy();
     }
-
 }

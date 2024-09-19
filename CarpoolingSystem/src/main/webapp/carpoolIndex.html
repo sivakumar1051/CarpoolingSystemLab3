@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carpooling System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #e9ecef;
+        }
+
+        h2 {
+            color: #343a40;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e2e6ea;
+        }
+
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 16px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 1.5em;
+            }
+            form {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Available Rides</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Starting Location</th>
+                <th>Destination</th>
+                <th>Seats Available</th>
+            </tr>
+        </thead>
+        <tbody id="rideList">
+            <!-- Available rides will be populated here -->
+        </tbody>
+    </table>
+
+    <h2>Offer a New Ride</h2>
+    <form action="Carpool" method="POST">
+        <label for="startLocation">Starting Location:</label>
+        <input type="text" name="startLocation" required>
+        
+        <label for="destination">Destination:</label>
+        <input type="text" name="destination" required>
+        
+        <label for="seatsAvailable">Seats Available:</label>
+        <input type="number" name="seatsAvailable" required>
+        
+        <input type="submit" value="Offer Ride">
+    </form>
+</body>
+</html>
