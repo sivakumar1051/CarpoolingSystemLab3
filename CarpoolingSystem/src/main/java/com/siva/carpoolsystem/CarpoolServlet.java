@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -18,7 +19,7 @@ public class CarpoolServlet extends HttpServlet {
     private static final Logger logData = Logger.getLogger(CarpoolServlet.class.getName());
 
     // List to store available rides
-    private List<CarpoolRide> ridesAvailable = new ArrayList<>();
+    private List<CarpoolRide> ridesAvailable = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void init() throws ServletException {
@@ -54,15 +55,17 @@ public class CarpoolServlet extends HttpServlet {
 
     private String generateRideListHtml() {
         StringBuilder rideDataBuilder = new StringBuilder();
-        if (ridesAvailable.isEmpty()) {
-            rideDataBuilder.append("<tr><td colspan='3'>No available rides at the moment.</td></tr>");
-        } else {
-            for (CarpoolRide ride : ridesAvailable) {
-                rideDataBuilder.append("<tr>")
+        synchronized (ridesAvailable) { // Synchronize access to the rides list
+            if (ridesAvailable.isEmpty()) {
+                rideDataBuilder.append("<tr><td colspan='3'>No available rides at the moment.</td></tr>");
+            } else {
+                for (CarpoolRide ride : ridesAvailable) {
+                    rideDataBuilder.append("<tr>")
                         .append("<td>").append(ride.getRideStarLocation()).append("</td>")
                         .append("<td>").append(ride.getRideDestination()).append("</td>")
                         .append("<td>").append(ride.getNoOfSeats()).append("</td>")
                         .append("</tr>");
+                }
             }
         }
         return rideDataBuilder.toString();
@@ -75,9 +78,11 @@ public class CarpoolServlet extends HttpServlet {
         int seatsAvailable = Integer.parseInt(request.getParameter("seatsAvailable"));
 
         // Create a new ride and add it to the list
-        CarpoolRide newRide = new CarpoolRide(startLocation, destination, seatsAvailable);
-        ridesAvailable.add(newRide);
-        logData.info("New ride offered: " + newRide);
+        CarpoolRide newCarpoolRide = new CarpoolRide(startLocation, destination, seatsAvailable);
+        synchronized (ridesAvailable) { // Synchronize access to the rides list
+            ridesAvailable.add(newCarpoolRide);
+        }
+        logData.info("New ride offered: " + newCarpoolRide);
 
         // Redirect to doGet to display updated list of rides
         response.sendRedirect(request.getContextPath() + "/Carpool");
