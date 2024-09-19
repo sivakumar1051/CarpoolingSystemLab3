@@ -9,17 +9,23 @@
     <display-name>CarpoolServlet</display-name>
     <servlet-name>CarpoolServlet</servlet-name>
     <servlet-class>com.siva.carpoolsystem.CarpoolServlet</servlet-class>
+    
+    <!-- Initialization parameter for maximum rides -->
+    <init-param>
+      <param-name>maxRides</param-name>
+      <param-value>100</param-value> <!-- Maximum number of rides the system can handle -->
+    </init-param>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>CarpoolServlet</servlet-name>
-    <url-pattern>/Carpool</url-pattern>
+    <url-pattern>/Carpool</url-pattern> <!-- Mapped to /carpool -->
   </servlet-mapping>
 
   <display-name>CarpoolingSystem</display-name>
 
   <welcome-file-list>
-    <welcome-file>Carpool</welcome-file>
+    <welcome-file>Carpool</welcome-file> <!-- Default welcome file -->
     <welcome-file>index.htm</welcome-file>
     <welcome-file>index.jsp</welcome-file>
     <welcome-file>default.html</welcome-file>
